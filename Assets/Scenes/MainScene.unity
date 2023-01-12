@@ -386,12 +386,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cells_x: 10
-  cells_y: 10
+  cells_y: 5
   cells_z: 10
   grid_size: {x: 10, y: 10, z: 10}
   cell_size: {x: 0, y: 0, z: 0}
   bubullePrefab: {fileID: 5918907865288001710, guid: 069bfaa00b29b4944adc801b2b73966d,
     type: 3}
+  nbBubulle: 10000
+  bubulles: []
 --- !u!4 &2071631646
 Transform:
   m_ObjectHideFlags: 0
@@ -400,7 +402,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2071631644}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 3.9362001, y: 2.0808368, z: -5.3927565}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
