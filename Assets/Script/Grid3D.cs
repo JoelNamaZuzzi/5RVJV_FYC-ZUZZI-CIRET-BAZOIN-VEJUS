@@ -18,12 +18,12 @@ public class Grid3D : MonoBehaviour
 
     void Awake()
     {
-        //Initialize grid
+        //Init Grid et bubulles
         cell_size = new Vector3(grid_size.x / cells_x, grid_size.y / cells_y, grid_size.z / cells_z);
         velocity = new Vector3[cells_x, cells_y, cells_z];
         density = new float[cells_x, cells_y, cells_z];
         pressure = new float[cells_x, cells_y, cells_z];
-        // Initialize grid cells with default values
+        //Init grid avec les cells à 0 partout
         for (int i = 0; i < cells_x; i++) {
             for (int j = 0; j < cells_y; j++) {
                 for (int k = 0; k < cells_z; k++)
@@ -34,12 +34,13 @@ public class Grid3D : MonoBehaviour
                 }
             }
         }
-
+        //Init bubulles et les mettre dans la liste
         bubulles = new GameObject[nbBubulle];
         for(int i=0; i<nbBubulle; i++)
         {
-            Vector3 pos = new Vector3(Random.Range(0, grid_size.x * cells_x+transform.position.x), Random.Range(0, grid_size.y * cells_y+transform.position.y),
-                Random.Range(0, grid_size.z * cells_z+transform.position.z));
+            Vector3 gridOrg = transform.position;
+            Vector3 pos = new Vector3(Random.Range(0, grid_size.x * cells_x+gridOrg.x), Random.Range(0, grid_size.y * cells_y+gridOrg.y),
+                Random.Range(0, grid_size.z * cells_z+gridOrg.z));
             GameObject bubulle = Instantiate(bubullePrefab, pos, Quaternion.identity);
             bubulles.Append(bubulle);
             bubulle.transform.parent = transform;
@@ -48,21 +49,10 @@ public class Grid3D : MonoBehaviour
     
     //Updating the cells & particles
     void UpdateFluid(Grid3D grid, float dt) {
-        // Step 1: Advection
-        Vector3[,,] new_velocity = new Vector3[cells_x, cells_y, cells_z];
-        for (int i = 0; i < cells_x; i++) {
-            for (int j = 0; j < cells_y; j++) {
-                for (int k = 0; k < cells_z; k++)
-                {   
-                    // Calculate new position of particle
-                    //Vector3 pos = new Vector3(i, j, k) * cell_size;
-                    Vector3 pos = Vector3.Scale(new Vector3(i, j, k), cell_size);
-                    Vector3 new_pos = pos - velocity[i, j, k] * dt;
-
-                    // Use trilinear interpolation to estimate new velocity
-                    //new_velocity[i, j, k] = TrilinearInterpolation(velocity, new_pos, grid_size, cells_x, cells_y, cells_z);
-                }
-            }
+        // Etape 1: Advection
+        foreach (GameObject bubulle in bubulles)
+        {
+            Advection(bubulle);
         }
 
         // Step 2: Projection
@@ -100,9 +90,17 @@ public class Grid3D : MonoBehaviour
             }
         }
         // Update grid with new properties
-        velocity = new_velocity;
+        //velocity = new_velocity;
         // density = new_density;
         // pressure = new_pressure;
+    }
+
+    void Advection(GameObject bubulle)
+    {
+        Vector3 pos = bubulle.transform.position;
+        //Vector3 vel = TrilinearInterpolation
+        //Vector3 newPos = pos + vel;
+        //bubulle.transform.position = newPos;
     }
 }
 

@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5515152191891039005}
   - component: {fileID: 6686797984958931161}
   - component: {fileID: 5782814829733042028}
+  - component: {fileID: 1951446630275403257}
   m_Layer: 0
   m_Name: bubulle
   m_TagString: Untagged
@@ -83,3 +84,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1951446630275403257
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5918907865288001710}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2f75b1c195a29f041be5d1cd53502185, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  density: 0
+  pressure: 0
+  velocity: {x: 0, y: 0, z: 0}
