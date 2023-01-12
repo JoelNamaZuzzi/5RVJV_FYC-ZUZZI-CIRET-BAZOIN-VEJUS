@@ -47,12 +47,12 @@ public class Grid3D : MonoBehaviour
         }
     }
     
-    //Updating the cells & particles
+    //Maj particules et fluides
     void UpdateFluid(Grid3D grid, float dt) {
         // Etape 1: Advection
         foreach (GameObject bubulle in bubulles)
         {
-            Advection(bubulle);
+            Advection(bubulle, dt);
         }
 
         // Step 2: Projection
@@ -94,13 +94,14 @@ public class Grid3D : MonoBehaviour
         // density = new_density;
         // pressure = new_pressure;
     }
-
-    void Advection(GameObject bubulle)
+    //Advection Semi Lagrangienne, permet de mettre à jour de façon précise les positions et autres parametre des particules
+    void Advection(GameObject bubulle, float dt)
     {
         Vector3 pos = bubulle.transform.position;
         //Vector3 vel = TrilinearInterpolation
-        //Vector3 newPos = pos + vel;
-        //bubulle.transform.position = newPos;
+        //Vector3 newPos = pos - vel*dt;
+        //vel = TrilinearInterpolation (en utilisant new pos)
+        //bubulle.transform.position = pos -vel*dt;
     }
 }
 
