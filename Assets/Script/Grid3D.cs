@@ -16,7 +16,7 @@ public class Grid3D : MonoBehaviour
     public float[,,] pressure;
     public GameObject bubullePrefab;
     public int nbBubulle;
-    public GameObject[] bubulles;
+    public List<GameObject> bubulles;
 
     void Awake()
     {
@@ -37,20 +37,25 @@ public class Grid3D : MonoBehaviour
             }
         }
         //Init bubulles et les mettre dans la liste
-        bubulles = new GameObject[nbBubulle];
+        bubulles = new List<GameObject>();
         for(int i=0; i<nbBubulle; i++)
         {
             Vector3 gridOrg = transform.position;
             Vector3 pos = new Vector3(Random.Range(0, grid_size.x * cells_x+gridOrg.x), Random.Range(0, grid_size.y * cells_y+gridOrg.y),
                 Random.Range(0, grid_size.z * cells_z+gridOrg.z));
             GameObject bubulle = Instantiate(bubullePrefab, pos, Quaternion.identity);
-            bubulles.Append(bubulle);
+            bubulles.Add(bubulle);
             bubulle.transform.parent = transform;
+            bubulle.GetComponent<Bubulle>().position = pos;
         }
     }
-    
+
+    void Update()
+    {
+        UpdateFluid(Time.deltaTime);
+    }
     //Maj particules et fluides
-    void UpdateFluid(Grid3D grid, float dt) {
+    void UpdateFluid(float dt) {
         // Etape 1: Advection
         foreach (GameObject bubulle in bubulles)
         {
@@ -63,6 +68,7 @@ public class Grid3D : MonoBehaviour
         // Calculate new velocity
         // ...
         // Calculate divergence of velocity field
+        /*
         float[,,] divergence = new float[cells_x, cells_y, cells_z];
         for (int i = 1; i < cells_x-1; i++) {
             for (int j = 1; j < cells_y-1; j++) {
@@ -95,16 +101,17 @@ public class Grid3D : MonoBehaviour
         //velocity = new_velocity;
         // density = new_density;
         // pressure = new_pressure;
+        */
     }
     //Advection Semi Lagrangienne, permet de mettre à jour de façon précise les positions et autres parametre des particules
     void Advection(GameObject bubulle, float dt)
     {
-        Bubulle bubulleData = bubulle.GetComponent<Bubulle>();
-        Vector3 pos = bubulleData.position;
-        //Vector3 vel = TrilinearInterpolation
-        //Vector3 newPos = pos - vel*dt;
-        //vel = TrilinearInterpolation (en utilisant new pos)
-        //bubulle.transform.position = pos -vel*dt;
+        Vector3 bubullepos = bubulle.GetComponent<Bubulle>().position;
+        Vector3 pos = bubullepos;
+        Vector3 vel = TrilinéairInterpolate(velocity, pos);
+        Vector3 newPos = pos - vel*dt;
+        vel = TrilinéairInterpolate(velocity, newPos);
+        bubullepos = pos -vel*dt;
     }
     
     // exmple étape 7 pour densité
@@ -142,28 +149,66 @@ public class Grid3D : MonoBehaviour
         }
     }
     
+    //Interpolation trilinéaire retournant un float 
     public float TrilinéairInterpolate(float[,,]gridData,Vector3 pos)
     {
-        pos -= Vector3.Scale(Vector3.one , cell_size) * 0.5f;
-        pos = Vector3.Scale(pos, new Vector3(1f / cell_size.x, 1f / cell_size.y, 1f / cell_size.z));
+        Vector3 gridPos = pos - transform.position;
+        gridPos = new Vector3(gridPos.x / grid_size.x, gridPos.x / grid_size.y, gridPos.x / grid_size.z);
 
-        int x = (int)pos.x;
-        int y = (int)pos.y;
-        int z = (int)pos.z;
+        int x0 = Mathf.FloorToInt(gridPos.x);
+        int y0 = Mathf.FloorToInt(gridPos.y);
+        int z0 = Mathf.FloorToInt(gridPos.z);
 
-        float x_lerp = pos.x - x;
-        float y_lerp = pos.y - y;
-        float z_lerp = pos.z - z;
+        float x1 = x0+1;
+        float y1 = y0+1;
+        float z1 = z0+1;
 
-        float x00 = Mathf.Lerp(gridData[x, y, z], gridData[x+1, y, z], x_lerp);
-        float x10 = Mathf.Lerp(gridData[x, y+1, z], gridData[x+1, y+1, z], x_lerp);
-        float x01 = Mathf.Lerp(gridData[x, y, z+1], gridData[x+1, y, z+1], x_lerp);
-        float x11 = Mathf.Lerp(gridData[x, y+1, z+1], gridData[x+1, y+1, z+1], x_lerp);
+        float xd = gridPos.x - x0;
+        float yd = gridPos.y - y0;
+        float zd = gridPos.z - z0;
 
-        float y0 = Mathf.Lerp(x00, x10, y_lerp);
-        float y1 = Mathf.Lerp(x01, x11, y_lerp);
+        float c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[(int)x1, y0, z0] * xd;
+        float c10 = gridData[x0, (int)y1, z0] * (1 - xd) + gridData[(int)x1, (int)y1, z0] * xd;
+        float c01 = gridData[x0, y0, (int)z1] * (1 - xd) + gridData[(int)x1, y0, (int)z1] * xd;
+        float c11 = gridData[x0, (int)y1, (int)z1] * (1 - xd) + gridData[(int)x1, (int)y1, (int)z1] * xd;
 
-        return Mathf.Lerp(y0, y1, z_lerp);
+        float c0 = c00 * (1 - yd) + c10 * yd;
+        float c1 = c01 * (1 - yd) + c11 * yd;
+
+        float c = c0 * (1 - zd) + c1 * zd;
+        
+        return c;
+    }
+    
+    //Interpolation trilinéaire retournant un float
+    public Vector3 TrilinéairInterpolate(Vector3[,,] gridData, Vector3 pos)
+    {
+        Vector3 gridPos = pos - transform.position;
+        gridPos = new Vector3(gridPos.x / grid_size.x, gridPos.x / grid_size.y, gridPos.x / grid_size.z);
+
+        int x0 = Mathf.FloorToInt(gridPos.x);
+        int y0 = Mathf.FloorToInt(gridPos.y);
+        int z0 = Mathf.FloorToInt(gridPos.z);
+
+        float x1 = x0+1;
+        float y1 = y0+1;
+        float z1 = z0+1;
+
+        float xd = gridPos.x - x0;
+        float yd = gridPos.y - y0;
+        float zd = gridPos.z - z0;
+
+        Vector3 c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[(int)x1, y0, z0] * xd;
+        Vector3 c10 = gridData[x0, (int)y1, z0] * (1 - xd) + gridData[(int)x1, (int)y1, z0] * xd;
+        Vector3 c01 = gridData[x0, y0, (int)z1] * (1 - xd) + gridData[(int)x1, y0, (int)z1] * xd;
+        Vector3 c11 = gridData[x0, (int)y1, (int)z1] * (1 - xd) + gridData[(int)x1, (int)y1, (int)z1] * xd;
+
+        Vector3 c0 = c00 * (1 - yd) + c10 * yd;
+        Vector3 c1 = c01 * (1 - yd) + c11 * yd;
+
+        Vector3 c = c0 * (1 - zd) + c1 * zd;
+        
+        return c;
     }
 }
 
