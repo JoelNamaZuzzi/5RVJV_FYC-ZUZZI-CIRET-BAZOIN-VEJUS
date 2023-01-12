@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class Grid3D : MonoBehaviour
 {
@@ -97,12 +99,73 @@ public class Grid3D : MonoBehaviour
     //Advection Semi Lagrangienne, permet de mettre à jour de façon précise les positions et autres parametre des particules
     void Advection(GameObject bubulle, float dt)
     {
-        Vector3 pos = bubulle.transform.position;
+        Bubulle bubulleData = bubulle.GetComponent<Bubulle>();
+        Vector3 pos = bubulleData.position;
         //Vector3 vel = TrilinearInterpolation
         //Vector3 newPos = pos - vel*dt;
         //vel = TrilinearInterpolation (en utilisant new pos)
         //bubulle.transform.position = pos -vel*dt;
     }
+    
+    // exmple étape 7 pour densité
+    public void GridDataDensity()
+    {
+
+        int gridResolution = density.GetLength(0);
+        // Initialiser toutes les cellules de la grille à zéro
+        Array.Clear(density, 0, density.Length);
+
+        // Pour chaque particule, ajouter sa densité et sa vitesse à la cellule de la grille la plus proche
+        foreach (GameObject particle in bubulles)
+        {
+            Bubulle particledata = particle.GetComponent<Bubulle>();
+            int x = (int)(particledata.position.x * gridResolution);
+            int y = (int)(particledata.position.y * gridResolution);
+            int z = (int)(particledata.position.z * gridResolution);
+            density[x, y, z] += particledata.density;
+        }
+
+        // Pour chaque cellule de la grille, diviser par le nombre de particules qui ont contribué à la cellule pour obtenir la densité et la vitesse moyennes
+        for (int x = 0; x < gridResolution; x++)
+        {
+            for (int y = 0; y < gridResolution; y++)
+            {
+                for (int z = 0; z < gridResolution; z++)
+                {
+                    float count = density[x, y, z];
+                    if (count > 0)
+                    {
+                        density[x, y, z] /= count;
+                    }
+                }
+            }
+        }
+    }
+    
+    public float TrilinéairInterpolate(float[,,]gridData,Vector3 pos)
+    {
+        pos -= Vector3.Scale(Vector3.one , cell_size) * 0.5f;
+        pos = Vector3.Scale(pos, new Vector3(1f / cell_size.x, 1f / cell_size.y, 1f / cell_size.z));
+
+        int x = (int)pos.x;
+        int y = (int)pos.y;
+        int z = (int)pos.z;
+
+        float x_lerp = pos.x - x;
+        float y_lerp = pos.y - y;
+        float z_lerp = pos.z - z;
+
+        float x00 = Mathf.Lerp(gridData[x, y, z], gridData[x+1, y, z], x_lerp);
+        float x10 = Mathf.Lerp(gridData[x, y+1, z], gridData[x+1, y+1, z], x_lerp);
+        float x01 = Mathf.Lerp(gridData[x, y, z+1], gridData[x+1, y, z+1], x_lerp);
+        float x11 = Mathf.Lerp(gridData[x, y+1, z+1], gridData[x+1, y+1, z+1], x_lerp);
+
+        float y0 = Mathf.Lerp(x00, x10, y_lerp);
+        float y1 = Mathf.Lerp(x01, x11, y_lerp);
+
+        return Mathf.Lerp(y0, y1, z_lerp);
+    }
 }
+
 
 
