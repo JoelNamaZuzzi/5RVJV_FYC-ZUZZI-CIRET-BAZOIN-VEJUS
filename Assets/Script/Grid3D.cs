@@ -191,6 +191,7 @@ public class Grid3D : MonoBehaviour
 
     void Projection(GameObject bubulle)
     {
+        int[,,] ParticleCounts = new int[cells_x, cells_y, cells_z];
         // Boucle sur toutes les particules
         for (int i = 0; i < nbBubulle; i++)
         {
@@ -209,7 +210,7 @@ public class Grid3D : MonoBehaviour
             velocity[gridX, gridY, gridZ] += particleVelocity;
 
             // Incrémente le compteur de particules pour cette cellule
-            nbBubulle[gridX++, gridY++, gridZ++];
+            ParticleCounts[gridX, gridY, gridZ]++;
         }
 
 // Boucle sur toutes les cellules de la grille
@@ -220,7 +221,7 @@ public class Grid3D : MonoBehaviour
                 for (int z = 0; z < cells_z; z++)
                 {
                     // Nombre de particules pour cette cellule
-                    int count = nbBubulle[x, y, z];
+                    int count = ParticleCounts[x, y, z];
 
                     // Si il y a des particules pour cette cellule
                     if (count > 0)
@@ -230,7 +231,7 @@ public class Grid3D : MonoBehaviour
                     }
 
                     // Réinitialise le compteur de particules pour cette cellule
-                    nbBubulle[x, y, z] = 0;
+                    ParticleCounts[x, y, z] = 0;
                 }
             }
         }
@@ -247,7 +248,7 @@ public class Grid3D : MonoBehaviour
                     float divergence =
                         (velocity[x + 1, y, z].x - velocity[x - 1, y, z].x +
                             velocity[x, y + 1, z].y - velocity[x, y - 1, z].y +
-                            velocity[x, y, z + 1].z - velocity[x, y, z - 1].z) / (2 * cellSize);
+                            velocity[x, y, z + 1].z - velocity[x, y, z - 1].z) / (2 * 1.0f);
                     //Applique les contraintes pour divergence nulle
                     pressures[x, y, z] += divergence;
 
