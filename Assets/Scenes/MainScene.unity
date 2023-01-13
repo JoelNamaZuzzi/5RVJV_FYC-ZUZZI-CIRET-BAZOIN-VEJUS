@@ -392,7 +392,7 @@ MonoBehaviour:
   cell_size: 1
   bubullePrefab: {fileID: 5918907865288001710, guid: 069bfaa00b29b4944adc801b2b73966d,
     type: 3}
-  nbBubulle: 100
+  nbBubulle: 38
   bubulles: []
 --- !u!4 &2071631646
 Transform:

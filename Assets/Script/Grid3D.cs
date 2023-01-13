@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using TreeEditor;
 using Unity.VisualScripting;
 using UnityEngine;
 using Random = UnityEngine.Random;
@@ -17,9 +18,11 @@ public class Grid3D : MonoBehaviour
     public GameObject bubullePrefab;
     public int nbBubulle;
     public List<GameObject> bubulles;
+    private float minx, maxx, miny, maxy, minz, maxz;
 
     void Awake()
     {
+        Vector3 gridOrg = transform.position;
         //Init Grid et bubulles
         velocity = new Vector3[cells_x, cells_y, cells_z];
         density = new float[cells_x, cells_y, cells_z];
@@ -32,21 +35,24 @@ public class Grid3D : MonoBehaviour
                 for (int k = 0; k < cells_z; k++)
                 {
                     //velocity[i, j, k] = Vector3.zero;
-                    velocity[i, j, k] = new Vector3(1, 1, 0);
+                    velocity[i, j, k] = new Vector3(-1, 0, -1);
                     density[i, j, k] = 0.0f;
                     pressures[i, j, k] = 0.0f;
                 }
             }
         }
-        Debug.Log(velocity.GetLength(0));
-        Debug.Log(velocity.GetLength(1));
-        Debug.Log(velocity.GetLength(2));
+
+        minx = gridOrg.x;
+        miny = gridOrg.y;
+        minz = gridOrg.z;
+        maxx = gridOrg.x + cells_x;
+        maxy = gridOrg.y + cells_y;
+        maxz = gridOrg.z + cells_z;
 
         //Init bubulles et les mettre dans la liste
         bubulles = new List<GameObject>();
         for (int i = 0; i < nbBubulle; i++)
         {
-            Vector3 gridOrg = transform.position;
             Vector3 pos = new Vector3(Random.Range(0+gridOrg.x, cells_x + gridOrg.x),
                 Random.Range(0+gridOrg.y, cells_y + gridOrg.y),
                 Random.Range(0+gridOrg.z, cells_z + gridOrg.z));
@@ -85,16 +91,20 @@ public class Grid3D : MonoBehaviour
     void Advection(GameObject bubulle, float dt)
     {
         Vector3 bubullepos = bubulle.transform.position;
+        Vector3 bubullevec = bubulle.GetComponent<Bubulle>().velocity;
         Debug.Log(bubulle.name);
         Vector3 vel = TrilinéairInterpolate(velocity, bubulle, bubullepos);
         Vector3 newPos = bubullepos - dt*vel;
         vel = TrilinéairInterpolate(velocity,bubulle, newPos);
         //Debug.Log(bubulle.name + newPos);
-        bubullepos = new Vector3(newPos.x, newPos.y, newPos.z)-vel*dt;
-        bubulle.transform.position = bubullepos;
+        newPos = new Vector3(newPos.x+bubullevec.x, newPos.y+bubullevec.y, newPos.z+bubullevec.z)-vel*dt;
+        newPos.x = Mathf.Repeat(newPos.x - minx, maxx)+minx;
+        //newPos.y = Mathf.Repeat(newPos.y - miny, maxy)+miny;
+        newPos.z = Mathf.Repeat(newPos.z - minz, maxz)+minz;
+        bubulle.transform.position = newPos;
         //Debug.Log(bubulle.name + bubullepos);
     }
-    
+
     // exmple étape 7 pour densité
     public void GridDataDensity()
     {
@@ -129,46 +139,15 @@ public class Grid3D : MonoBehaviour
             }
         }
     }
-    
-    //Interpolation trilinéaire retournant un float 
+
+    //Interpolation trilinéaire retournant un float
     public float TrilinéairInterpolate(float[,,]gridData,GameObject bubulle, Vector3 pos)
-    {
-        Vector3 gridPos = pos - transform.position;
-        gridPos = new Vector3(gridPos.x / grid_size.x, gridPos.x / grid_size.y, gridPos.x / grid_size.z);
-
-        int x0 = Mathf.FloorToInt(gridPos.x);
-        int y0 = Mathf.FloorToInt(gridPos.y);
-        int z0 = Mathf.FloorToInt(gridPos.z);
-
-        float x1 = x0+1;
-        float y1 = y0+1;
-        float z1 = z0+1;
-
-        float xd = gridPos.x - x0;
-        float yd = gridPos.y - y0;
-        float zd = gridPos.z - z0;
-
-        float c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[(int)x1, y0, z0] * xd;
-        float c10 = gridData[x0, (int)y1, z0] * (1 - xd) + gridData[(int)x1, (int)y1, z0] * xd;
-        float c01 = gridData[x0, y0, (int)z1] * (1 - xd) + gridData[(int)x1, y0, (int)z1] * xd;
-        float c11 = gridData[x0, (int)y1, (int)z1] * (1 - xd) + gridData[(int)x1, (int)y1, (int)z1] * xd;
-
-        float c0 = c00 * (1 - yd) + c10 * yd;
-        float c1 = c01 * (1 - yd) + c11 * yd;
-
-        float c = c0 * (1 - zd) + c1 * zd;
-        
-        return c;
-    }
-    
-    //Interpolation trilinéaire retournant un Vector3
-    public Vector3 TrilinéairInterpolate(Vector3[,,] gridData, GameObject bubulle, Vector3 pos)
     {
         pos = bubulle.transform.position;
         Vector3 gridPosition = (pos - transform.position); // gridSize;
-        
-        //Debug.Log(gridPosition);
-        Debug.Log("x: "+gridPosition.x+" y: "+gridPosition.y+" z: "+gridPosition.z);
+
+        Debug.Log(gridPosition);
+        //Debug.Log("x: "+gridPosition.x+" y: "+gridPosition.y+" z: "+gridPosition.z);
         int x0 = Mathf.FloorToInt(gridPosition.x);
         int y0 = Mathf.FloorToInt(gridPosition.y);
         int z0 = Mathf.FloorToInt(gridPosition.z);
@@ -202,7 +181,70 @@ public class Grid3D : MonoBehaviour
             z0 = cells_z;
             bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
         }
-        Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
+        //Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
+        int x1 = Mathf.Clamp(x0 + 1, 0, cells_x-1);
+        int y1 = Mathf.Clamp(y0 + 1, 0, cells_y-1);
+        int z1 = Mathf.Clamp(z0 + 1, 0, cells_z-1);
+
+        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x-1);
+        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y-1);
+        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z-1);
+        //Interpolation en x
+        float c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[x1, y0, z0] * xd;
+        float c10 = gridData[x0, y1, z0] * (1 - xd) + gridData[x1, y1, z0] * xd;
+        float c01 = gridData[x0, y0, z1] * (1 - xd) + gridData[x1, y0, z1] * xd;
+        float c11 = gridData[x0, y1, z1] * (1 - xd) + gridData[x1, y1, z1] * xd;
+        //Interpolation en y
+        float c0 = c00 * (1 - yd) + c10 * yd;
+        float c1 = c01 * (1 - yd) + c11 * yd;
+        //Interpolation en z
+        float c = c0 * (1 - zd) + c1 * zd;
+        //Debug.Log(c);
+        return c;
+    }
+
+    //Interpolation trilinéaire retournant un Vector3
+    public Vector3 TrilinéairInterpolate(Vector3[,,] gridData, GameObject bubulle, Vector3 pos)
+    {
+        pos = bubulle.transform.position;
+        Vector3 gridPosition = (pos - transform.position); // gridSize;
+
+        Debug.Log(gridPosition);
+        //Debug.Log("x: "+gridPosition.x+" y: "+gridPosition.y+" z: "+gridPosition.z);
+        int x0 = Mathf.FloorToInt(gridPosition.x);
+        int y0 = Mathf.FloorToInt(gridPosition.y);
+        int z0 = Mathf.FloorToInt(gridPosition.z);
+        if (x0 < 0)
+        {
+            x0 = (int)transform.position.x;
+            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
+        }
+        else if (x0 > cells_x)
+        {
+            x0 = cells_x;
+            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
+        }
+        if (y0 < 0)
+        {
+            y0 = (int)transform.position.y;
+            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
+        }
+        else if (y0 > cells_y)
+        {
+            y0 = cells_y;
+            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
+        }
+        if (z0 < 0)
+        {
+            z0 = (int)transform.position.z;
+            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
+        }
+        else if (z0 > cells_z)
+        {
+            z0 = cells_z;
+            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
+        }
+        //Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
         int x1 = Mathf.Clamp(x0 + 1, 0, cells_x-1);
         int y1 = Mathf.Clamp(y0 + 1, 0, cells_y-1);
         int z1 = Mathf.Clamp(z0 + 1, 0, cells_z-1);
@@ -301,6 +343,3 @@ public class Grid3D : MonoBehaviour
         }
     }
 }
-
-
-
