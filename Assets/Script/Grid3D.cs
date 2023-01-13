@@ -86,7 +86,7 @@ public class Grid3D : MonoBehaviour
         Vector3 vel = TrilinéairInterpolate(velocity, bubullepos);
         Vector3 newPos = bubullepos - dt*vel;
         vel = TrilinéairInterpolate(velocity, newPos);
-        Debug.Log(bubulle.name + newPos);
+        //Debug.Log(bubulle.name + newPos);
         bubullepos = new Vector3(newPos.x*(grid_size.x * cells_x+transform.position.x), 
             newPos.y*(grid_size.y * cells_y+transform.position.y), 
             newPos.z*(grid_size.z * cells_z+transform.position.z))-vel*dt;
