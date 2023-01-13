@@ -22,6 +22,6 @@ public class Bubulle : MonoBehaviour
 
     private void Update()
     {
-        gameObject.transform.position = position;
+        //gameObject.transform.position = position;
     }
 }
