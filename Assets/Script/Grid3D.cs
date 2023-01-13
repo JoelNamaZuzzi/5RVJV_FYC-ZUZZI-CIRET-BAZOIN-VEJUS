@@ -10,7 +10,7 @@ public class Grid3D : MonoBehaviour
 {
     public int cells_x, cells_y, cells_z;
     public Vector3 grid_size;
-    public Vector3 cell_size;
+    public float cell_size=1.0f;
     public Vector3[,,] velocity;
     public float[,,] density;
     public float[,,] pressures;
@@ -21,7 +21,6 @@ public class Grid3D : MonoBehaviour
     void Awake()
     {
         //Init Grid et bubulles
-        cell_size = new Vector3(grid_size.x / cells_x, grid_size.y / cells_y, grid_size.z / cells_z);
         velocity = new Vector3[cells_x, cells_y, cells_z];
         density = new float[cells_x, cells_y, cells_z];
         pressures = new float[cells_x, cells_y, cells_z];
@@ -39,15 +38,18 @@ public class Grid3D : MonoBehaviour
                 }
             }
         }
+        Debug.Log(velocity.GetLength(0));
+        Debug.Log(velocity.GetLength(1));
+        Debug.Log(velocity.GetLength(2));
 
         //Init bubulles et les mettre dans la liste
         bubulles = new List<GameObject>();
         for (int i = 0; i < nbBubulle; i++)
         {
             Vector3 gridOrg = transform.position;
-            Vector3 pos = new Vector3(Random.Range(0, grid_size.x * cells_x + gridOrg.x),
-                Random.Range(0, grid_size.y * cells_y + gridOrg.y),
-                Random.Range(0, grid_size.z * cells_z + gridOrg.z));
+            Vector3 pos = new Vector3(Random.Range(0+gridOrg.x, cells_x + gridOrg.x),
+                Random.Range(0+gridOrg.y, cells_y + gridOrg.y),
+                Random.Range(0+gridOrg.z, cells_z + gridOrg.z));
             GameObject bubulle = Instantiate(bubullePrefab, pos, Quaternion.identity);
             bubulles.Add(bubulle);
             bubulle.transform.parent = transform;
@@ -74,7 +76,7 @@ public class Grid3D : MonoBehaviour
         // Etape 2 Projection
         foreach (GameObject bubulle in bubulles)
         {
-            Projection(bubulle);
+            //Projection(bubulle);
         }
     }
 
@@ -83,14 +85,14 @@ public class Grid3D : MonoBehaviour
     void Advection(GameObject bubulle, float dt)
     {
         Vector3 bubullepos = bubulle.transform.position;
-        Vector3 vel = TrilinéairInterpolate(velocity, bubullepos);
+        Debug.Log(bubulle.name);
+        Vector3 vel = TrilinéairInterpolate(velocity, bubulle, bubullepos);
         Vector3 newPos = bubullepos - dt*vel;
-        vel = TrilinéairInterpolate(velocity, newPos);
+        vel = TrilinéairInterpolate(velocity,bubulle, newPos);
         //Debug.Log(bubulle.name + newPos);
-        bubullepos = new Vector3(newPos.x*(grid_size.x * cells_x+transform.position.x), 
-            newPos.y*(grid_size.y * cells_y+transform.position.y), 
-            newPos.z*(grid_size.z * cells_z+transform.position.z))-vel*dt;
-        //Debug.Log(bubullepos);
+        bubullepos = new Vector3(newPos.x, newPos.y, newPos.z)-vel*dt;
+        bubulle.transform.position = bubullepos;
+        //Debug.Log(bubulle.name + bubullepos);
     }
     
     // exmple étape 7 pour densité
@@ -129,7 +131,7 @@ public class Grid3D : MonoBehaviour
     }
     
     //Interpolation trilinéaire retournant un float 
-    public float TrilinéairInterpolate(float[,,]gridData,Vector3 pos)
+    public float TrilinéairInterpolate(float[,,]gridData,GameObject bubulle, Vector3 pos)
     {
         Vector3 gridPos = pos - transform.position;
         gridPos = new Vector3(gridPos.x / grid_size.x, gridPos.x / grid_size.y, gridPos.x / grid_size.z);
@@ -160,21 +162,54 @@ public class Grid3D : MonoBehaviour
     }
     
     //Interpolation trilinéaire retournant un Vector3
-    public Vector3 TrilinéairInterpolate(Vector3[,,] gridData, Vector3 pos)
+    public Vector3 TrilinéairInterpolate(Vector3[,,] gridData, GameObject bubulle, Vector3 pos)
     {
-
+        pos = bubulle.transform.position;
         Vector3 gridPosition = (pos - transform.position); // gridSize;
-        gridPosition = new Vector3(pos.x/(grid_size.x*cells_x), pos.y/(grid_size.y*cells_y), pos.z/(grid_size.z*cells_z));
+        
+        //Debug.Log(gridPosition);
+        Debug.Log("x: "+gridPosition.x+" y: "+gridPosition.y+" z: "+gridPosition.z);
         int x0 = Mathf.FloorToInt(gridPosition.x);
         int y0 = Mathf.FloorToInt(gridPosition.y);
         int z0 = Mathf.FloorToInt(gridPosition.z);
-        int x1 = x0 + 1;
-        int y1 = y0 + 1;
-        int z1 = z0 + 1;
+        if (x0 < 0)
+        {
+            x0 = (int)transform.position.x;
+            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
+        }
+        else if (x0 > cells_x)
+        {
+            x0 = cells_x;
+            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
+        }
+        if (y0 < 0)
+        {
+            y0 = (int)transform.position.y;
+            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
+        }
+        else if (y0 > cells_y)
+        {
+            y0 = cells_y;
+            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
+        }
+        if (z0 < 0)
+        {
+            z0 = (int)transform.position.z;
+            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
+        }
+        else if (z0 > cells_z)
+        {
+            z0 = cells_z;
+            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
+        }
+        Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
+        int x1 = Mathf.Clamp(x0 + 1, 0, cells_x-1);
+        int y1 = Mathf.Clamp(y0 + 1, 0, cells_y-1);
+        int z1 = Mathf.Clamp(z0 + 1, 0, cells_z-1);
 
-        float xd = gridPosition.x - x0;
-        float yd = gridPosition.y - y0;
-        float zd = gridPosition.z - z0;
+        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x-1);
+        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y-1);
+        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z-1);
         //Interpolation en x
         Vector3 c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[x1, y0, z0] * xd;
         Vector3 c10 = gridData[x0, y1, z0] * (1 - xd) + gridData[x1, y1, z0] * xd;
