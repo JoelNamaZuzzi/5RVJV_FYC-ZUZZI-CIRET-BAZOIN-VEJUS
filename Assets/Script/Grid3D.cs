@@ -32,7 +32,7 @@ public class Grid3D : MonoBehaviour
                 for (int k = 0; k < cells_z; k++)
                 {
                     //velocity[i, j, k] = Vector3.zero;
-                    velocity[i, j, k] = new Vector3(100, 5, 0);
+                    velocity[i, j, k] = new Vector3(1, 1, 0);
                     density[i, j, k] = 0.0f;
                     pressures[i, j, k] = 0.0f;
                 }
@@ -54,7 +54,7 @@ public class Grid3D : MonoBehaviour
             bubulles.Add(bubulle);
             bubulle.transform.parent = transform;
             bubulle.GetComponent<Bubulle>().position = pos;
-            bubulle.GetComponent<Bubulle>().velocity = new Vector3(10, 0, 0);
+            bubulle.GetComponent<Bubulle>().velocity = new Vector3(0.1f, 0, 0);
             bubulle.name = "bubulle" + i;
         }
     }
@@ -120,10 +120,10 @@ public class Grid3D : MonoBehaviour
             {
                 for (int z = 0; z < gridResolution; z++)
                 {
-                    float count = density[x, y, z];
-                    if (count > 0)
+                    float dcount = density[x, y, z];
+                    if (dcount > 0)
                     {
-                        density[x, y, z] /= count;
+                        density[x, y, z] /= dcount;
                     }
                 }
             }

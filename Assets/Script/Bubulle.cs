@@ -22,6 +22,21 @@ public class Bubulle : MonoBehaviour
 
     private void Update()
     {
-        //gameObject.transform.position = position;
+        position = gameObject.transform.position;
     }
+
+    /*private void OnCollisionEnter(Collision other)
+    {
+        float coefDeRestitution = 0.5f;
+        velocity *= -coefDeRestitution;
+    }*/
+
+    private void OnTriggerEnter(Collider other)
+    {
+        float coefDeRestitution = 0.5f;
+        velocity *= -coefDeRestitution;
+    }
+
+    
+    
 }
