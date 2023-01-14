@@ -15,6 +15,7 @@ public class Grid3D : MonoBehaviour
     public float cell_size = 1.0f;
     public int nbBubulle;
     public int maxIterProjection = 5;
+    public int maxIterPoisson = 5;
     public Vector3[,,] velocity;
     public float[,,] density;
     public float[,,] pressures;
@@ -39,7 +40,7 @@ public class Grid3D : MonoBehaviour
                 for (int k = 0; k < cells_z; k++)
                 {
                     //velocity[i, j, k] = Vector3.zero;
-                    velocity[i, j, k] = new Vector3(Random.Range(-1,1), 0, Random.Range(-1,1));
+                    velocity[i, j, k] = new Vector3(Random.Range(-1,1), Random.Range(-1,1), Random.Range(-1,1));
                     density[i, j, k] = 0.0f;
                     pressures[i, j, k] = 0.0f;
                     divergence[i, j, k] = new Vector3(0, 0, 0);
@@ -66,7 +67,7 @@ public class Grid3D : MonoBehaviour
             bubulles.Add(bubulle);
             bubulle.transform.parent = transform;
             bubulle.GetComponent<Bubulle>().position = pos;
-            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-0.1f,0.1f), 0, Random.Range(-0.1f,0.1f));
+            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f));
             bubulle.name = "bubulle" + i;
         }
     }
@@ -86,7 +87,7 @@ public class Grid3D : MonoBehaviour
         }
 
         // Etape 2 Projection
-        Projection();
+        Projection(dt);
     }
 
 
@@ -96,14 +97,14 @@ public class Grid3D : MonoBehaviour
     {
         Vector3 bubullepos = bubulle.transform.position;
         Vector3 bubullevec = bubulle.GetComponent<Bubulle>().velocity;
-        Debug.Log(bubulle.name);
+        //Debug.Log(bubulle.name);
         Vector3 vel = TrilinéairInterpolate(velocity, bubulle, bubullepos);
         Vector3 newPos = bubullepos - dt * vel;
         vel = TrilinéairInterpolate(velocity, bubulle, newPos);
         //Debug.Log(bubulle.name + newPos);
         newPos = new Vector3(newPos.x + bubullevec.x, newPos.y + bubullevec.y, newPos.z + bubullevec.z) - vel * dt;
         newPos.x = Mathf.Repeat(newPos.x - minx, maxx) + minx;
-        //newPos.y = Mathf.Repeat(newPos.y - miny, maxy)+miny;
+        newPos.y = Mathf.Repeat(newPos.y - miny, maxy) + miny;
         newPos.z = Mathf.Repeat(newPos.z - minz, maxz) + minz;
         bubulle.transform.position = newPos;
         //Debug.Log(bubulle.name + bubullepos);
@@ -150,7 +151,7 @@ public class Grid3D : MonoBehaviour
         pos = bubulle.transform.position;
         Vector3 gridPosition = (pos - transform.position); // gridSize;
 
-        Debug.Log(gridPosition);
+        //Debug.Log(gridPosition);
         //Debug.Log("x: "+gridPosition.x+" y: "+gridPosition.y+" z: "+gridPosition.z);
         int x0 = Mathf.FloorToInt(gridPosition.x);
         int y0 = Mathf.FloorToInt(gridPosition.y);
@@ -158,34 +159,28 @@ public class Grid3D : MonoBehaviour
         if (x0 < 0)
         {
             x0 = (int)transform.position.x;
-            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
         }
         else if (x0 > cells_x)
         {
             x0 = cells_x;
-            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
         }
 
         if (y0 < 0)
         {
             y0 = (int)transform.position.y;
-            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
         }
         else if (y0 > cells_y)
         {
             y0 = cells_y;
-            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
         }
 
         if (z0 < 0)
         {
             z0 = (int)transform.position.z;
-            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
         }
         else if (z0 > cells_z)
         {
             z0 = cells_z;
-            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
         }
 
         //Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
@@ -216,7 +211,7 @@ public class Grid3D : MonoBehaviour
         pos = bubulle.transform.position;
         Vector3 gridPosition = (pos - transform.position); // gridSize;
 
-        Debug.Log(gridPosition);
+        //Debug.Log(gridPosition);
         //Debug.Log("x: "+gridPosition.x+" y: "+gridPosition.y+" z: "+gridPosition.z);
         int x0 = Mathf.FloorToInt(gridPosition.x);
         int y0 = Mathf.FloorToInt(gridPosition.y);
@@ -224,37 +219,31 @@ public class Grid3D : MonoBehaviour
         if (x0 < 0)
         {
             x0 = (int)transform.position.x;
-            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
         }
         else if (x0 > cells_x)
         {
             x0 = cells_x;
-            bubulle.GetComponent<Bubulle>().velocity.x = -bubulle.GetComponent<Bubulle>().velocity.x;
         }
 
         if (y0 < 0)
         {
             y0 = (int)transform.position.y;
-            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
         }
         else if (y0 > cells_y)
         {
             y0 = cells_y;
-            bubulle.GetComponent<Bubulle>().velocity.y = -bubulle.GetComponent<Bubulle>().velocity.y;
         }
 
         if (z0 < 0)
         {
             z0 = (int)transform.position.z;
-            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
         }
         else if (z0 > cells_z)
         {
             z0 = cells_z;
-            bubulle.GetComponent<Bubulle>().velocity.z = -bubulle.GetComponent<Bubulle>().velocity.z;
         }
 
-        //Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
+        Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
         int x1 = Mathf.Clamp(x0 + 1, 0, cells_x - 1);
         int y1 = Mathf.Clamp(y0 + 1, 0, cells_y - 1);
         int z1 = Mathf.Clamp(z0 + 1, 0, cells_z - 1);
@@ -278,7 +267,7 @@ public class Grid3D : MonoBehaviour
 
     //Projection pour mettre à jour les vélocités des particules et des cellules basée
     //sur la méthode de Staggered Grid utilisée pour résoudre les équations de Navier Strokes
-    void Projection()
+    void Projection(float dt)
     {
         //Init pressures à 0
         for (int i = 0; i < cells_x; i++)
@@ -307,7 +296,8 @@ public class Grid3D : MonoBehaviour
                     }
                 }
             }
-            //SolvePoisson()
+            //Utilisation d'un solveur de poisson pour corriger la pression et permettre de mettre une bonne vélocité sur les cellules
+            SolvePoisson();
             // Correct the velocity for each cell
             for (int x = 1; x < cells_x - 1; x++)
             {
@@ -322,11 +312,53 @@ public class Grid3D : MonoBehaviour
                     }
                 }
             }
-
-            for (int j = 0; j < bubulles.Count(); j++)
+            //Correct Velocity for each bubulles
+            for (int j = 0; j < bubulles.Count-1; j++)
             {
-                
+                Debug.Log(bubulles[j].name);
+                Vector3 gridVelocity  = TrilinéairInterpolate(velocity, bubulles[i], bubulles[i].transform.position);
+                float gridPressure  = TrilinéairInterpolate(pressures, bubulles[i], bubulles[i].transform.position);
+                bubulles[i].GetComponent<Bubulle>().velocity+= (gridVelocity - bubulles[i].GetComponent<Bubulle>().velocity) * (gridPressure - bubulles[i].GetComponent<Bubulle>().pressure) * dt;
             }
+        }
+    }
+
+    void SolvePoisson()
+    {
+        float[,,] newPressures = new float[cells_x,cells_y,cells_z];
+        float error = 0f;
+        float tolerance = 0.0001f;
+        int iter = 0;
+        while (iter <= maxIterPoisson && error > tolerance)
+        {
+            error = 0.0f;
+            for (int x = 1; x < cells_x - 1; x++)
+            {
+                for (int y = 1; y < cells_y - 1; y++)
+                {
+                    for (int z = 1; z < cells_z - 1; z++)
+                    {
+                        float newPressure = pressures[x - 1, y, z] + pressures[x + 1, y, z] + pressures[x, y - 1, z] +
+                                            pressures[x, y + 1, z] + pressures[x, y, z - 1] + pressures[x, y, z + 1];
+                        newPressure += divergence[x, y, z].x;
+                        newPressure /= 6;
+                        error += Mathf.Abs(newPressure - pressures[x, y, z]);
+                    }
+                }
+            }
+
+            for (int x = 1; x < cells_x - 1; x++)
+            {
+                for (int y = 1; y < cells_y - 1; y++)
+                {
+                    for (int z = 1; z < cells_z - 1; z++)
+                    {
+                        pressures[x,y,z] = newPressures[x, y, z];
+                    }
+                }
+            }
+
+            iter++;
         }
     }
 }
