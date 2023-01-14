@@ -95,7 +95,10 @@ public class Grid3D : MonoBehaviour
     //et autres parametre des particules sauf la vélocité
     void Advection(GameObject bubulle, float dt)
     {
-        Vector3 bubullepos = bubulle.transform.position;
+        // Appliquer la force de gravité du rigidbody à chaque particule
+        bubulle.GetComponent<Bubulle>().force += bubulle.GetComponent<Bubulle>().rigidbody.mass * Physics.gravity;
+
+            Vector3 bubullepos = bubulle.transform.position;
         Vector3 bubullevec = bubulle.GetComponent<Bubulle>().velocity;
         //Debug.Log(bubulle.name);
         Vector3 vel = TrilinéairInterpolate(velocity, bubulle, bubullepos);

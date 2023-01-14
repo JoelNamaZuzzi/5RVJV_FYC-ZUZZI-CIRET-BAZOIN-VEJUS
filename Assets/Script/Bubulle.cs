@@ -6,10 +6,17 @@ using UnityEngine;
 public class Bubulle : MonoBehaviour
 {
     public Vector3 position;    // position de la particule
-    public Vector3 velocity;    // vitesse de la particule
+    public Vector3 velocity;    // force s'appliquant sur la particule
+    public Vector3 force;       // vitesse de la particule
     public float density;       // densité de la particule
     public float pressure;      // pression de la particule
-    public Vector3 force;       // force s'appliquant sur la particule
+    [HideInInspector]public Rigidbody rigidbody;
+
+    private void Awake()
+    {
+        rigidbody = this.GetComponent<Rigidbody>();
+        rigidbody.mass = 1.0f;
+    }
 
     public Bubulle(Vector3 pos)
     {
@@ -25,17 +32,17 @@ public class Bubulle : MonoBehaviour
         position = gameObject.transform.position;
     }
 
-    /*private void OnCollisionEnter(Collision other)
-    {
-        float coefDeRestitution = 0.5f;
-        velocity *= -coefDeRestitution;
-    }*/
-
-    private void OnTriggerEnter(Collider other)
+    private void OnCollisionEnter(Collision other)
     {
         float coefDeRestitution = 0.5f;
         velocity *= -coefDeRestitution;
     }
+
+    /*private void OnTriggerEnter(Collider other)
+    {
+        float coefDeRestitution = 0.5f;
+        velocity *= -coefDeRestitution;
+    }*/
 
     
     
