@@ -39,7 +39,7 @@ public class Grid3D : MonoBehaviour
                 for (int k = 0; k < cells_z; k++)
                 {
                     //velocity[i, j, k] = Vector3.zero;
-                    velocity[i, j, k] = new Vector3(Random.Range(-1,1), 0, Random.Range(-1,1));
+                    velocity[i, j, k] = new Vector3(Random.Range(-1,1), Random.Range(-1,1), Random.Range(-1,1));
                     density[i, j, k] = 0.0f;
                     pressures[i, j, k] = Random.Range(0f,1f);
                     divergence[i, j, k] = new Vector3(0, 0, 0);
@@ -66,7 +66,7 @@ public class Grid3D : MonoBehaviour
             bubulles.Add(bubulle);
             bubulle.transform.parent = transform;
             bubulle.GetComponent<Bubulle>().position = pos;
-            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-0.1f,0.1f), 0, Random.Range(-0.1f,0.1f));
+            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f));
             bubulle.name = "bubulle" + i;
         }
     }
@@ -117,41 +117,6 @@ public class Grid3D : MonoBehaviour
         newPos.y = Mathf.Repeat(newPos.y - miny, maxy) + miny;
         newPos.z = Mathf.Repeat(newPos.z - minz, maxz) + minz;
         bubulle.transform.position = newPos;
-    }
-
-    // exmple étape 7 pour densité
-    public void GridDataDensity()
-    {
-
-        int gridResolution = density.GetLength(0);
-        // Initialiser toutes les cellules de la grille à zéro
-        Array.Clear(density, 0, density.Length);
-
-        // Pour chaque particule, ajouter sa densité et sa vitesse à la cellule de la grille la plus proche
-        foreach (GameObject particle in bubulles)
-        {
-            Bubulle particledata = particle.GetComponent<Bubulle>();
-            int x = (int)(particledata.position.x * gridResolution);
-            int y = (int)(particledata.position.y * gridResolution);
-            int z = (int)(particledata.position.z * gridResolution);
-            density[x, y, z] += particledata.density;
-        }
-
-        // Pour chaque cellule de la grille, diviser par le nombre de particules qui ont contribué à la cellule pour obtenir la densité et la vitesse moyennes
-        for (int x = 0; x < gridResolution; x++)
-        {
-            for (int y = 0; y < gridResolution; y++)
-            {
-                for (int z = 0; z < gridResolution; z++)
-                {
-                    float dcount = density[x, y, z];
-                    if (dcount > 0)
-                    {
-                        density[x, y, z] /= dcount;
-                    }
-                }
-            }
-        }
     }
 
     //Interpolation trilinéaire retournant un float
