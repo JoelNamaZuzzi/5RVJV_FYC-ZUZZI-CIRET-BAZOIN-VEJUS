@@ -388,11 +388,11 @@ MonoBehaviour:
   cells_x: 10
   cells_y: 10
   cells_z: 10
-  grid_size: {x: 1, y: 1, z: 1}
   cell_size: 1
+  nbBubulle: 38
+  maxIterProjection: 100
   bubullePrefab: {fileID: 5918907865288001710, guid: 069bfaa00b29b4944adc801b2b73966d,
     type: 3}
-  nbBubulle: 38
   bubulles: []
 --- !u!4 &2071631646
 Transform:
