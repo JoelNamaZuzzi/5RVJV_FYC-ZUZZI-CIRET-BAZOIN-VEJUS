@@ -15,7 +15,6 @@ public class Grid3D : MonoBehaviour
     public int maxIterProjection = 5;
     public int maxIterPoisson = 5;
     public Vector3[,,] velocity;
-    public float[,,] density;
     public float[,,] pressures;
     public GameObject bubullePrefab;
     public List<GameObject> bubulles;
@@ -27,7 +26,6 @@ public class Grid3D : MonoBehaviour
         //Init Grid et bubulles
         Vector3 gridOrg = transform.position;
         velocity = new Vector3[cells_x, cells_y, cells_z];
-        density = new float[cells_x, cells_y, cells_z];
         pressures = new float[cells_x, cells_y, cells_z];
         divergence = new Vector3[cells_x, cells_y, cells_z];
         
@@ -40,7 +38,6 @@ public class Grid3D : MonoBehaviour
                 {
                     //velocity[i, j, k] = Vector3.zero;
                     velocity[i, j, k] = new Vector3(Random.Range(-1,1)*2, Random.Range(-1,1)*2, Random.Range(-1,1)*2);
-                    density[i, j, k] = 0.0f;
                     pressures[i, j, k] = j+1;
                     divergence[i, j, k] = Vector3.zero;
                 }
