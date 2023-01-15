@@ -39,7 +39,7 @@ public class Grid3D : MonoBehaviour
                 for (int k = 0; k < cells_z; k++)
                 {
                     //velocity[i, j, k] = Vector3.zero;
-                    velocity[i, j, k] = new Vector3(Random.Range(-1,1), Random.Range(-1,1), Random.Range(-1,1));
+                    velocity[i, j, k] = new Vector3(Random.Range(-1,1)*2, Random.Range(-1,1)*2, Random.Range(-1,1)*2);
                     density[i, j, k] = 0.0f;
                     pressures[i, j, k] = Random.Range(0f,1f);
                     divergence[i, j, k] = new Vector3(0, 0, 0);

@@ -29,7 +29,7 @@ public class Bubulle : MonoBehaviour
 
     private void Update()
     {
-        position = gameObject.transform.position;
+        //position = gameObject.transform.position;
     }
 
     private void OnCollisionEnter(Collision other)
