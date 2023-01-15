@@ -257,7 +257,7 @@ public class Grid3D : MonoBehaviour
                 Vector3 pos = bubulles[j].transform.position;
                 Vector3 gridVelocity  = TrilinéairInterpolate(velocity, pos);
                 float gridPressure  = TrilinéairInterpolate(pressures, pos);
-                curBubulle.velocity += (gridVelocity - curBubulle.velocity) * (dt * (gridPressure - curBubulle.pressure) * dt);
+                curBubulle.velocity += (gridVelocity - curBubulle.velocity) * (gridPressure - curBubulle.pressure) * dt;
             }
         }
     }
@@ -286,7 +286,7 @@ public class Grid3D : MonoBehaviour
                                             pressures[x, y + 1, z] + pressures[x, y, z - 1] + pressures[x, y, z + 1];
                         newPressure += divergence[x, y, z].x;
                         newPressure /= 6;
-                        newPressure -= divergence[x,y,z].x/6;
+                        newPressures[x, y, z] = newPressure;
                         error += Mathf.Abs(newPressure - pressures[x, y, z]);
                     }
                 }
