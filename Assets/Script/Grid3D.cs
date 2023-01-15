@@ -66,7 +66,7 @@ public class Grid3D : MonoBehaviour
             bubulles.Add(bubulle);
             bubulle.transform.parent = transform;
             bubulle.GetComponent<Bubulle>().position = pos;
-            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-1,1)/10, Random.Range(-1,1)/10, Random.Range(-1,1)/10);
+            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f));
             bubulle.name = "bubulle" + i;
         }
     }
@@ -257,7 +257,7 @@ public class Grid3D : MonoBehaviour
                 Vector3 pos = bubulles[j].transform.position;
                 Vector3 gridVelocity  = TrilinéairInterpolate(velocity, pos);
                 float gridPressure  = TrilinéairInterpolate(pressures, pos);
-                curBubulle.velocity += (gridVelocity - curBubulle.velocity) * (gridPressure - curBubulle.pressure) * dt;
+                curBubulle.velocity -= (gridVelocity - curBubulle.velocity) * (gridPressure - curBubulle.pressure) * dt;
             }
         }
     }
