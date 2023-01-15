@@ -21,7 +21,7 @@ public class Bubulle : MonoBehaviour
     public Bubulle(Vector3 pos)
     {
         position = pos;
-        velocity = Vector3.zero;
+        //velocity = Vector3.zero;
         density = 1.0f;
         pressure = 0.0f;
         force = Vector3.zero;
