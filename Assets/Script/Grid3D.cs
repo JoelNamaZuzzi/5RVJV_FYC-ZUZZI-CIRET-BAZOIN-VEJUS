@@ -286,6 +286,7 @@ public class Grid3D : MonoBehaviour
                                             pressures[x, y + 1, z] + pressures[x, y, z - 1] + pressures[x, y, z + 1];
                         newPressure += divergence[x, y, z].x;
                         newPressure /= 6;
+                        newPressure -= divergence[x,y,z].x/6;
                         error += Mathf.Abs(newPressure - pressures[x, y, z]);
                     }
                 }
