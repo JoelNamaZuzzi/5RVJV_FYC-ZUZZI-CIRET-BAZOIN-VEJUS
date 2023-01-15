@@ -104,13 +104,13 @@ public class Grid3D : MonoBehaviour
         Vector3 vel = TrilinéairInterpolate(velocity, bubullepos);
         
         //mise à jour de la position en parcourant la position inverse (Car semi lagrangienne)
-        Vector3 newPos = bubullepos - dt * vel;
+        Vector3 newPos = bubullepos + dt * vel;
         
         //Nouvelle interpolation avec la nouvelle position
         vel = TrilinéairInterpolate(velocity, newPos);
         
         //On met à jour la nouvelle position avec la vélocité de la bubulle
-        newPos = new Vector3(newPos.x + bubullevec.x, newPos.y + bubullevec.y, newPos.z + bubullevec.z) - vel * dt;
+        newPos = new Vector3(newPos.x + bubullevec.x, newPos.y + bubullevec.y, newPos.z + bubullevec.z) + vel * dt;
         
         //Si une bubulle est en dehors, on fait boucler
         newPos.x = Mathf.Repeat(newPos.x - minx, maxx) + minx;
