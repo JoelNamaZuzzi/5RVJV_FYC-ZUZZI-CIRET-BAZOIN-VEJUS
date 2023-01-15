@@ -244,7 +244,7 @@ public class Grid3D : MonoBehaviour
                         Vector3 pressureForce = new Vector3((pressures[x + 1,y,z] - pressures[x - 1,y,z]) / (2 * cells_x),
                             (pressures[x,y + 1,z] - pressures[x,y - 1,z]) / (2 * cells_y),
                             (pressures[x,y,z + 1] - pressures[x,y,z - 1]) / (2 * cells_z));
-                        velocity[x,y,z] -= pressureForce;
+                        velocity[x,y,z] -= pressureForce*dt;
                     }
                 }
             }
