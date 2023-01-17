@@ -126,18 +126,18 @@ public class Grid3D : MonoBehaviour
         int y0 = Mathf.FloorToInt(gridPosition.y);
         int z0 = Mathf.FloorToInt(gridPosition.z);
         
-        x0 = Mathf.Clamp(x0 , 0, cells_x - 1);
-        y0 = Mathf.Clamp(y0 , 0, cells_y - 1);
-        z0 = Mathf.Clamp(z0 , 0, cells_z - 1);
+        x0 = Mathf.Clamp(x0 , 0, cells_x -1);
+        y0 = Mathf.Clamp(y0 , 0, cells_y -1);
+        z0 = Mathf.Clamp(z0 , 0, cells_z -1);
 
         //Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
         int x1 = Mathf.Clamp(x0 + 1, 0, cells_x - 1);
         int y1 = Mathf.Clamp(y0 + 1, 0, cells_y - 1);
         int z1 = Mathf.Clamp(z0 + 1, 0, cells_z - 1);
 
-        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x - 1);
-        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y - 1);
-        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z - 1);
+        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x);
+        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y);
+        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z);
         
         //Interpolation en x
         float c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[x1, y0, z0] * xd;
@@ -165,18 +165,18 @@ public class Grid3D : MonoBehaviour
         int y0 = Mathf.FloorToInt(gridPosition.y);
         int z0 = Mathf.FloorToInt(gridPosition.z);
         
-        x0 = Mathf.Clamp(x0 , 0, cells_x - 1);
-        y0 = Mathf.Clamp(y0 , 0, cells_y - 1);
-        z0 = Mathf.Clamp(z0 , 0, cells_z - 1);
+        x0 = Mathf.Clamp(x0 , 0, cells_x -1);
+        y0 = Mathf.Clamp(y0 , 0, cells_y -1);
+        z0 = Mathf.Clamp(z0 , 0, cells_z -1);
 
         int x1 = Mathf.Clamp(x0 + 1, 0, cells_x - 1);
         int y1 = Mathf.Clamp(y0 + 1, 0, cells_y - 1);
         int z1 = Mathf.Clamp(z0 + 1, 0, cells_z - 1);
 
-        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x - 1);
-        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y - 1);
-        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z - 1);
-        
+        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x );
+        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y );
+        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z );
+            
         //Interpolation en x
         Vector3 c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[x1, y0, z0] * xd;
         Vector3 c10 = gridData[x0, y1, z0] * (1 - xd) + gridData[x1, y1, z0] * xd;
