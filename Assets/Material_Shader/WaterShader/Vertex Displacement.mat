@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: Vertex Displacement
-  m_Shader: {fileID: -6465566751694194690, guid: 0069790e1b2e33b44b48d5dfa424315f,
+  m_Shader: {fileID: -6465566751694194690, guid: 2100dd66be5a0d744ad0b2b4bb8b6807,
     type: 3}
   m_ValidKeywords: []
   m_InvalidKeywords: []
@@ -66,6 +66,10 @@ Material:
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _SpecGlossMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Texture2D:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
@@ -127,6 +131,7 @@ Material:
     - _SrcBlend: 1
     - _Strength: 2
     - _Surface: 0
+    - _Thickness: 0.3
     - _WaveAmplitude: 2
     - _WaveSpeed: 0
     - _WorkflowMode: 1
@@ -137,7 +142,7 @@ Material:
     - Color_d1cdd8ab758a415fa997798233a1dde1: {r: 0.9433962, g: 0.8935564, b: 0.8935564,
         a: 1}
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color: {r: 0, g: 0.2827108, b: 1, a: 0.36078432}
     - _DeepColor: {r: 0.0706299, g: 0.08173687, b: 0.6037736, a: 0.12941177}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _FoamColor: {r: 1, g: 1, b: 1, a: 1}
