@@ -94,13 +94,13 @@ public class Grid3D : MonoBehaviour
         // Appliquer la force de gravité du rigidbody à chaque particule
         bubulle.GetComponent<Bubulle>().force += bubulle.GetComponent<Bubulle>().rigidbody.mass * Physics.gravity;
 
-            Vector3 bubullepos = bubulle.transform.position;
+        Vector3 bubullepos = bubulle.transform.position;
         Vector3 bubullevec = bubulle.GetComponent<Bubulle>().velocity;
         
         //On récupère la vélocité des à notre position par rapport aux autre cellules
         Vector3 vel = TrilinéairInterpolate(velocity, bubullepos);
         
-        //mise à jour de la position en parcourant la position inverse (Car semi lagrangienne)
+        //création de la nouvelle position
         Vector3 newPos = bubullepos + dt * vel;
         
         //Nouvelle interpolation avec la nouvelle position
