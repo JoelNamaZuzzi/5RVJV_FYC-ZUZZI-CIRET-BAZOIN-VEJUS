@@ -214,7 +214,7 @@ public class Grid3D : MonoBehaviour
         for (int i = 0; i < maxIterProjection; i++)
         {
             
-            //Applcations des contraintes de divergence nulle
+            //Applications des contraintes de divergence nulle
             for (int x = 1; x < cells_x - 1; x++)
             {
                 for (int y = 1; y < cells_y - 1; y++)
@@ -231,7 +231,7 @@ public class Grid3D : MonoBehaviour
             //Utilisation d'un solveur de poisson pour corriger la pression et permettre de mettre une bonne vélocité sur les cellules
             SolvePoisson();
             
-            // Correct the velocity for each cell
+            // On corrige la velicité pour chacune des cellules de la grille
             for (int x = 1; x < cells_x - 1; x++)
             {
                 for (int y = 1; y < cells_y - 1; y++)
@@ -254,7 +254,8 @@ public class Grid3D : MonoBehaviour
                 Vector3 pos = bubulles[j].transform.position;
                 Vector3 gridVelocity  = TrilinéairInterpolate(velocity, pos);
                 float gridPressure  = TrilinéairInterpolate(pressures, pos);
-                curBubulle.velocity -= (gridVelocity - curBubulle.velocity) * (gridPressure - curBubulle.pressure) * dt;
+               // curBubulle.velocity -= (gridVelocity - curBubulle.velocity) * (gridPressure - curBubulle.pressure) * dt;
+               curBubulle.velocity = (gridVelocity + new Vector3((gridPressure - curBubulle.pressure) / curBubulle.density,(gridPressure - curBubulle.pressure) / curBubulle.density,(gridPressure - curBubulle.pressure) / curBubulle.density))*dt;
             }
         }
     }
