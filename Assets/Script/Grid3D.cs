@@ -19,7 +19,7 @@ public class Grid3D : MonoBehaviour
     public GameObject bubullePrefab;
     public List<GameObject> bubulles;
     private float minx, maxx, miny, maxy, minz, maxz;
-    private Vector3[,,] divergence;
+    private float[,,] divergence;
 
     void Awake()
     {
@@ -27,7 +27,7 @@ public class Grid3D : MonoBehaviour
         Vector3 gridOrg = transform.position;
         velocity = new Vector3[cells_x, cells_y, cells_z];
         pressures = new float[cells_x, cells_y, cells_z];
-        divergence = new Vector3[cells_x, cells_y, cells_z];
+        divergence = new float[cells_x, cells_y, cells_z];
         
         //Init grid avec les cells à 0 partout
         for (int i = 0; i < cells_x; i++)
@@ -39,7 +39,7 @@ public class Grid3D : MonoBehaviour
                     //velocity[i, j, k] = Vector3.zero;
                     velocity[i, j, k] = new Vector3(Random.Range(-1,1)*2, Random.Range(-1,1)*2, Random.Range(-1,1)*2);
                     pressures[i, j, k] = j+1;
-                    divergence[i, j, k] = Vector3.zero;
+                    divergence[i, j, k] = 0.0f;
                 }
             }
         }
@@ -126,18 +126,18 @@ public class Grid3D : MonoBehaviour
         int y0 = Mathf.FloorToInt(gridPosition.y);
         int z0 = Mathf.FloorToInt(gridPosition.z);
         
-        x0 = Mathf.Clamp(x0 , 0, cells_x -1);
-        y0 = Mathf.Clamp(y0 , 0, cells_y -1);
-        z0 = Mathf.Clamp(z0 , 0, cells_z -1);
+        x0 = (int)(Mathf.Repeat(x0 - minx, maxx) + minx);
+        y0 = (int)(Mathf.Repeat(y0 - miny, maxy) + miny);
+        z0 = (int)(Mathf.Repeat(z0 - minz, maxz) + minz);
 
         //Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
-        int x1 = Mathf.Clamp(x0 + 1, 0, cells_x - 1);
-        int y1 = Mathf.Clamp(y0 + 1, 0, cells_y - 1);
-        int z1 = Mathf.Clamp(z0 + 1, 0, cells_z - 1);
+        int x1 = (int)(Mathf.Repeat(x0+1 - minx, maxx) + minx);
+        int y1 = (int)(Mathf.Repeat(y0+1 - miny, maxy) + miny);
+        int z1 = (int)(Mathf.Repeat(z0+1 - minz, maxz) + minz);
 
-        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x);
-        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y);
-        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z);
+        float xd = (int)(Mathf.Repeat(gridPosition.x-x0 - minx, maxx) + minx);
+        float yd = (int)(Mathf.Repeat(gridPosition.y-y0 - miny, maxy) + miny);
+        float zd = (int)(Mathf.Repeat(gridPosition.z-z0 - miny, maxy) + miny);
         
         //Interpolation en x
         float c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[x1, y0, z0] * xd;
@@ -159,23 +159,24 @@ public class Grid3D : MonoBehaviour
     public Vector3 TrilinéairInterpolate(Vector3[,,] gridData, Vector3 pos)
     {
         
-        Vector3 gridPosition = (pos - transform.position);
+        Vector3 gridPosition = (pos - transform.position); 
         
         int x0 = Mathf.FloorToInt(gridPosition.x);
         int y0 = Mathf.FloorToInt(gridPosition.y);
         int z0 = Mathf.FloorToInt(gridPosition.z);
         
-        x0 = Mathf.Clamp(x0 , 0, cells_x -1);
-        y0 = Mathf.Clamp(y0 , 0, cells_y -1);
-        z0 = Mathf.Clamp(z0 , 0, cells_z -1);
+        x0 = (int)(Mathf.Repeat(x0 - minx, maxx) + minx);
+        y0 = (int)(Mathf.Repeat(y0 - miny, maxy) + miny);
+        z0 = (int)(Mathf.Repeat(z0 - minz, maxz) + minz);
 
-        int x1 = Mathf.Clamp(x0 + 1, 0, cells_x - 1);
-        int y1 = Mathf.Clamp(y0 + 1, 0, cells_y - 1);
-        int z1 = Mathf.Clamp(z0 + 1, 0, cells_z - 1);
+        //Debug.Log("x0: "+x0+" y0: "+y0+" z0: "+z0);
+        int x1 = (int)(Mathf.Repeat(x0+1 - minx, maxx) + minx);
+        int y1 = (int)(Mathf.Repeat(y0+1 - miny, maxy) + miny);
+        int z1 = (int)(Mathf.Repeat(z0+1 - minz, maxz) + minz);
 
-        float xd = Mathf.Clamp(gridPosition.x - x0, 0, cells_x );
-        float yd = Mathf.Clamp(gridPosition.y - y0, 0, cells_y );
-        float zd = Mathf.Clamp(gridPosition.z - z0, 0, cells_z );
+        float xd = (int)(Mathf.Repeat(gridPosition.x-x0 - minx, maxx) + minx);
+        float yd = (int)(Mathf.Repeat(gridPosition.y-y0 - miny, maxy) + miny);
+        float zd = (int)(Mathf.Repeat(gridPosition.z-z0 - miny, maxy) + miny);
             
         //Interpolation en x
         Vector3 c00 = gridData[x0, y0, z0] * (1 - xd) + gridData[x1, y0, z0] * xd;
@@ -221,9 +222,9 @@ public class Grid3D : MonoBehaviour
                 {
                     for (int z = 1; z < cells_z - 1; z++)
                     {
-                        divergence[x, y, z] = (velocity[x + 1,y,z] - velocity[x - 1,y,z]) / cells_x + 
-                                              (velocity[x,y + 1,z] - velocity[x,y - 1,z]) / cells_y +
-                                              (velocity[x,y,z + 1] - velocity[x,y,z - 1]) / cells_z;
+                        divergence[x, y, z] = (velocity[x + 1,y,z].x - velocity[x - 1,y,z].x + 
+                                              velocity[x,y + 1,z].y - velocity[x,y - 1,z].y +
+                                              velocity[x,y,z + 1].z - velocity[x,y,z - 1].z)/6;
                     }
                 }
             }
@@ -282,7 +283,7 @@ public class Grid3D : MonoBehaviour
                     {
                         float newPressure = pressures[x - 1, y, z] + pressures[x + 1, y, z] + pressures[x, y - 1, z] +
                                             pressures[x, y + 1, z] + pressures[x, y, z - 1] + pressures[x, y, z + 1];
-                        newPressure += divergence[x, y, z].x;
+                        newPressure += divergence[x, y, z];
                         newPressure /= 6;
                         newPressures[x, y, z] = newPressure;
                         error += Mathf.Abs(newPressure - pressures[x, y, z]);
