@@ -246,21 +246,19 @@ public class Grid3D : MonoBehaviour
                     }
                 }
             }
-            
-            //On corrige la vélocité pour chacune des bubulles
-            
-            for (int j = 0; j < bubulles.Count; j++)
-            {
+        }
+        //On corrige la vélocité pour chacune des bubulles
+        for (int j = 0; j < bubulles.Count; j++)
+        {
                 
-                Bubulle curBubulle = bubulles[j].GetComponent<Bubulle>();
-                Vector3 pos = bubulles[j].transform.position;
-                Vector3 gridVelocity  = TrilinéairInterpolate(velocity, pos);
-                float gridPressure  = TrilinéairInterpolate(pressures, pos);
-                // curBubulle.velocity -= (gridVelocity - curBubulle.velocity) * (gridPressure - curBubulle.pressure) * dt;
-                curBubulle.velocity = (gridVelocity + new Vector3((gridPressure - curBubulle.pressure) / curBubulle.density,
-                    (gridPressure - curBubulle.pressure) / curBubulle.density,
-                    (gridPressure - curBubulle.pressure) / curBubulle.density))*dt;
-            }
+            Bubulle curBubulle = bubulles[j].GetComponent<Bubulle>();
+            Vector3 pos = bubulles[j].transform.position;
+            Vector3 gridVelocity  = TrilinéairInterpolate(velocity, pos);
+            float gridPressure  = TrilinéairInterpolate(pressures, pos);
+            // curBubulle.velocity -= (gridVelocity - curBubulle.velocity) * (gridPressure - curBubulle.pressure) * dt;
+            curBubulle.velocity = (gridVelocity + new Vector3((gridPressure - curBubulle.pressure) / curBubulle.density,
+                (gridPressure - curBubulle.pressure) / curBubulle.density,
+                (gridPressure - curBubulle.pressure) / curBubulle.density))*dt;
         }
     }
 
