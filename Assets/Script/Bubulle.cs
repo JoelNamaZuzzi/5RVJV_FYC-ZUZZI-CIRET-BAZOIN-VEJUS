@@ -16,7 +16,7 @@ public class Bubulle : MonoBehaviour
 
     private void Awake()
     {
-        rigidbody = this.GetComponent<Rigidbody>();
+        rigidbody = GetComponent<Rigidbody>();
         rigidbody.mass = 1.0f;
         volume = 4 / 3 * Mathf.PI * Mathf.Pow(GetComponent<SphereCollider>().radius, 3);
         density = rigidbody.mass / volume;
@@ -24,11 +24,11 @@ public class Bubulle : MonoBehaviour
 
     public Bubulle(Vector3 pos)
     {
-        position = pos;
+        //position = pos;
         //velocity = Vector3.zero;
-        density = 1.0f;
-        pressure = 0.0f;
-        force = Vector3.zero;
+        //density = 1.0f;
+        //pressure = 0.0f;
+        //force = Vector3.zero;
     }
 
     private void Update()
@@ -39,7 +39,7 @@ public class Bubulle : MonoBehaviour
     private void OnCollisionEnter(Collision other)
     {
         float coefDeRestitution = 0.5f;
-        velocity *= -coefDeRestitution;
+        //velocity *= -coefDeRestitution;
     }
 
     /*private void OnTriggerEnter(Collider other)

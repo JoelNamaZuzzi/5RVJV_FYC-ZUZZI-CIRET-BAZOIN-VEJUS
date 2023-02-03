@@ -37,7 +37,9 @@ public class Grid3D : MonoBehaviour
                 for (int k = 0; k < cells_z; k++)
                 {
                     //velocity[i, j, k] = Vector3.zero;
-                    velocity[i, j, k] = new Vector3(Random.Range(-1,1)*2, Random.Range(-1,1)*2, Random.Range(-1,1)*2);
+                    velocity[i, j, k] = new Vector3(Random.Range(-1,1)*2,
+                        Random.Range(-1,1)*2,
+                        Random.Range(-1,1)*2);
                     pressures[i, j, k] = j+1;
                     divergence[i, j, k] = 0.0f;
                 }
@@ -63,7 +65,9 @@ public class Grid3D : MonoBehaviour
             bubulles.Add(bubulle);
             bubulle.transform.parent = transform;
             bubulle.GetComponent<Bubulle>().position = pos;
-            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f), Random.Range(-0.1f,0.1f));
+            bubulle.GetComponent<Bubulle>().velocity = new Vector3(Random.Range(-0.1f,0.1f),
+                Random.Range(-0.1f,0.1f),
+                Random.Range(-0.1f,0.1f));
             bubulle.name = "bubulle" + i;
         }
     }
@@ -92,7 +96,7 @@ public class Grid3D : MonoBehaviour
     void Advection(GameObject bubulle, float dt)
     {
         // Appliquer la force de gravité du rigidbody à chaque particule
-        bubulle.GetComponent<Bubulle>().force += bubulle.GetComponent<Bubulle>().rigidbody.mass * Physics.gravity;
+        //bubulle.GetComponent<Bubulle>().force += bubulle.GetComponent<Bubulle>().rigidbody.mass * Physics.gravity;
 
         Vector3 bubullepos = bubulle.transform.position;
         Vector3 bubullevec = bubulle.GetComponent<Bubulle>().velocity;
